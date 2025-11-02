@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages          Message[]
+  contacts          Contact[]
+  notes             Note[]
+  assignedConversations Conversation[]
+  sessions          Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  VIEWER
+  USER
+}
+
+model Contact {
+  id            String   @id @default(cuid())
+  name          String?
+  phone         String?
+  email         String?
+  socialHandles Json?    // { twitter: "", facebook: "" }
+  metadata      Json?
+  createdById   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  createdBy     User           @relation(fields: [createdById], references: [id])
+  messages      Message[]
+  conversations Conversation[]
+  notes         Note[]
+  scheduledMessages ScheduledMessage[]
+
+  @@map("contacts")
+}
+
+model Conversation {
+  id            String            @id @default(cuid())
+  contactId     String
+  status        ConversationStatus @default(UNREAD)
+  assignedToId  String?
+  lastMessageAt DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  contact    Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  assignedTo User?     @relation(fields: [assignedToId], references: [id])
+  messages   Message[]
+
+  @@map("conversations")
+}
+
+enum ConversationStatus {
+  UNREAD
+  READ
+  ARCHIVED
+  RESOLVED
+}
+
+model Message {
+  id             String          @id @default(cuid())
+  conversationId String
+  contactId      String
+  userId         String?
+  content        String          @db.Text
+  channel        Channel
+  direction      Direction
+  status         MessageStatus   @default(SENT)
+  twilioSid      String?         @unique
+  attachments    Json?           // Array of attachment URLs
+  metadata       Json?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  contact      Contact      @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id])
+
+  @@index([conversationId])
+  @@index([contactId])
+  @@map("messages")
+}
+
+enum Channel {
+  SMS
+  WHATSAPP
+  EMAIL
+  TWITTER
+  FACEBOOK
+}
+
+enum Direction {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  READ
+}
+
+model ScheduledMessage {
+  id         String               @id @default(cuid())
+  contactId  String
+  userId     String?
+  content    String               @db.Text
+  channel    Channel
+  sendAt     DateTime
+  status     ScheduledMessageStatus @default(PENDING)
+  templateId String?
+  metadata   Json?
+  createdAt  DateTime             @default(now())
+  sentAt     DateTime?
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([sendAt, status])
+  @@map("scheduled_messages")
+}
+
+enum ScheduledMessageStatus {
+  PENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+model Note {
+  id         String       @id @default(cuid())
+  contactId  String
+  userId     String
+  content    String       @db.Text
+  visibility NoteVisibility @default(PUBLIC)
+  mentions   String[]     // Array of user IDs
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@map("notes")
+}
+
+enum NoteVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+model Analytics {
+  id             String   @id @default(cuid())
+  contactId      String?
+  conversationId String?
+  channel        Channel
+  eventType      String   // "message_sent", "message_received", "response_time"
+  value          Float?   // For numeric metrics like response time in seconds
+  metadata       Json?
+  timestamp      DateTime @default(now())
+
+  @@index([eventType, timestamp])
+  @@index([channel, timestamp])
+  @@map("analytics")
+}
