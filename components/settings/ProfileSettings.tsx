@@ -3,17 +3,20 @@
 
 import { useState, FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
 
-interface User {
+// Use the actual session user type
+interface SessionUser {
   id: string;
   name: string;
   email: string;
-  role: string;
+  emailVerified: boolean;
+  image?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface Props {
-  user?: User;
+  user?: SessionUser;
 }
 
 export default function ProfileSettings({ user }: Props) {
@@ -98,19 +101,6 @@ export default function ProfileSettings({ user }: Props) {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="john@example.com"
-          />
-        </div>
-
-        {/* Role (Read-only) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Role
-          </label>
-          <input
-            type="text"
-            value={user?.role || "USER"}
-            disabled
-            className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
           />
         </div>
 

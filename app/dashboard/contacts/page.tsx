@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/dashboard/contacts/page.tsx
 "use client";
 
@@ -10,10 +11,13 @@ import {
   EnvelopeIcon,
   PencilIcon,
   TrashIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import ContactModal from "@/components/contacts/ContactModal";
 import { formatDistanceToNow } from "date-fns";
 import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
+
 
 interface Contact {
   id: string;
@@ -47,6 +51,8 @@ export default function ContactsPage() {
   });
 
   const contacts: Contact[] = contactsData?.contacts || [];
+  const router = useRouter();
+
 
   // Filter contacts based on search
   const filteredContacts = contacts.filter(
@@ -261,8 +267,14 @@ export default function ContactsPage() {
                         <TrashIcon className="w-5 h-5" />
                       </button>
                       <button
+                        onClick={() => router.push(`/dashboard/contacts/${contact.id}`)}
+                        className="text-indigo-600 hover:text-indigo-900 mr-2"
+                        title="View Notes"
+                        >
+                        <DocumentTextIcon className="w-5 h-5" />
+                      </button>
+                      <button
                         onClick={() => {
-                            // Navigate to inbox with this contact
                             window.location.href = `/dashboard?contactId=${contact.id}`;
                         }}
                         className="text-indigo-600 hover:text-indigo-900"

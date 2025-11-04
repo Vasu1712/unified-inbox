@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/settings/profile/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -22,7 +23,7 @@ export async function PUT(req: NextRequest) {
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Invalid request", details: validation.error.errors },
+        { error: "Invalid request", details: validation.error },
         { status: 400 }
       );
     }

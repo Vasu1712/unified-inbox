@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import twilio from "twilio";
+import { Prisma } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
         direction: "INBOUND",
         status: "DELIVERED",
         twilioSid: messageSid,
-        attachments: mediaUrls.length > 0 ? { urls: mediaUrls } : null,
+        attachments: mediaUrls.length > 0 ? ({ urls: mediaUrls } as Prisma.InputJsonValue): Prisma.JsonNull,
       },
     });
 

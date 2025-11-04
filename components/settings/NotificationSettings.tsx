@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { BellIcon } from "@heroicons/react/24/outline";
 
 export default function NotificationSettings() {
   const [emailNotifications, setEmailNotifications] = useState(true);
