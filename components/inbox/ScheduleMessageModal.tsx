@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // components/inbox/ScheduleMessageModal.tsx
 "use client";
 
@@ -27,7 +28,7 @@ export default function ScheduleMessageModal({
   const [content, setContent] = useState("");
   const [channel, setChannel] = useState<"SMS" | "WHATSAPP">("SMS");
   const [sendAt, setSendAt] = useState<Date>(
-    new Date(Date.now() + 60 * 60 * 1000) // 1 hour from now
+    new Date(Date.now() + 60 * 60 * 1000)
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -56,18 +57,29 @@ export default function ScheduleMessageModal({
     }
   }
 
+  const handleDateChange = (date: Date | null | [Date, Date]) => {
+    if (date instanceof Date) {
+      setSendAt(date);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-xl max-w-lg w-full mx-4">
+        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
             Schedule Message
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
             <XMarkIcon className="w-6 h-6" />
           </button>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
@@ -82,7 +94,7 @@ export default function ScheduleMessageModal({
             <select
               value={channel}
               onChange={(e) => setChannel(e.target.value as any)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 text-black/50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="SMS">SMS</option>
               <option value="WHATSAPP">WhatsApp</option>
@@ -98,7 +110,7 @@ export default function ScheduleMessageModal({
               onChange={(e) => setContent(e.target.value)}
               required
               rows={4}
-              className="w-full px-3 py-2 text-black/50 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 text-black/50 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
               placeholder="Type your message..."
             />
           </div>
@@ -110,13 +122,13 @@ export default function ScheduleMessageModal({
             <div className="relative">
               <DatePicker
                 selected={sendAt}
-                onChange={(date: Date) => setSendAt(date)}
+                onChange={handleDateChange}
                 showTimeSelect
                 timeFormat="HH:mm"
                 timeIntervals={15}
                 dateFormat="MMMM d, yyyy h:mm aa"
                 minDate={new Date()}
-                className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 pl-10 text-black/70 border border-gray-300 rounded-lg text-sm"
               />
               <CalendarIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
             </div>
@@ -125,6 +137,7 @@ export default function ScheduleMessageModal({
             </p>
           </div>
 
+          {/* Actions */}
           <div className="flex gap-3 pt-4">
             <button
               type="button"

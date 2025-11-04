@@ -52,7 +52,9 @@ export default function SettingsPage() {
       {/* Content */}
       <div className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto p-8">
-          {activeTab === "profile" && <ProfileSettings user={session?.user} />}
+          {activeTab === "profile" && (
+            <ProfileSettings user={session?.user} />
+          )}
           {activeTab === "twilio" && <TwilioSettings />}
           {activeTab === "notifications" && <NotificationSettings />}
           {activeTab === "security" && <SecuritySettings />}

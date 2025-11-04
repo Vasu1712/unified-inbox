@@ -4,7 +4,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { createSender } from "@/lib/integrations";
 import { auth } from "@/lib/auth";
-import { Channel } from "@prisma/client";
+import { Channel, Prisma } from "@prisma/client";
 
 const sendMessageSchema = z.object({
   contactId: z.string(),
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Invalid request", details: validation.error.errors },
+        { error: "Invalid request", details: validation.error },
         { status: 400 }
       );
     }
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         direction: "OUTBOUND",
         status: "SENT",
         twilioSid: result.messageId,
-        attachments: mediaUrls ? { urls: mediaUrls } : null,
+        attachments: mediaUrls ? ({ urls: mediaUrls } as Prisma.InputJsonValue): Prisma.JsonNull,
       },
     });
 

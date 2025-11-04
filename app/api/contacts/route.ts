@@ -8,7 +8,7 @@ const createContactSchema = z.object({
   name: z.string().optional(),
   phone: z.string().optional(),
   email: z.email().optional(),
-  socialHandles: z.record(z.string()).optional(),
+  socialHandles: z.record(z.string(), z.string()).optional(),
 });
 
 // GET all contacts
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: "Invalid request", details: validation.error.errors },
+        { error: "Invalid request", details: validation.error },
         { status: 400 }
       );
     }
