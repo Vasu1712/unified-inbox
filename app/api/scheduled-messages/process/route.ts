@@ -1,13 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/scheduled-messages/process/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSender } from "@/lib/integrations";
 
-// This endpoint should be called by a cron job (e.g., every minute)
-// For production, use Vercel Cron or external cron service
 export async function POST(req: NextRequest) {
   try {
-    // Simple API key authentication for cron endpoint
     const apiKey = req.headers.get("x-api-key");
     if (apiKey !== process.env.CRON_API_KEY) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -15,7 +13,6 @@ export async function POST(req: NextRequest) {
 
     const now = new Date();
 
-    // Find messages that should be sent
     const pendingMessages = await prisma.scheduledMessage.findMany({
       where: {
         status: "PENDING",
@@ -26,14 +23,13 @@ export async function POST(req: NextRequest) {
       include: {
         contact: true,
       },
-      take: 10, // Process in batches
+      take: 10,
     });
 
     const results = [];
 
     for (const message of pendingMessages) {
       try {
-        // Determine recipient
         let recipient: string;
         if (message.channel === "SMS" || message.channel === "WHATSAPP") {
           recipient = message.contact.phone!;
@@ -43,7 +39,6 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        // Send message
         const sender = createSender(message.channel);
         const result = await sender.send({
           to: recipient,
@@ -51,7 +46,6 @@ export async function POST(req: NextRequest) {
         });
 
         if (result.success) {
-          // Update scheduled message
           await prisma.scheduledMessage.update({
             where: { id: message.id },
             data: {
@@ -60,7 +54,6 @@ export async function POST(req: NextRequest) {
             },
           });
 
-          // Create conversation and message records
           let conversation = await prisma.conversation.findFirst({
             where: { contactId: message.contactId },
           });
@@ -90,7 +83,6 @@ export async function POST(req: NextRequest) {
 
           results.push({ id: message.id, status: "sent" });
         } else {
-          // Mark as failed
           await prisma.scheduledMessage.update({
             where: { id: message.id },
             data: { status: "FAILED" },

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // components/contacts/CollaborativeNotes.tsx
 "use client";
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/settings/profile/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";

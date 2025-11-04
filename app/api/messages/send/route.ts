@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/messages/send/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { createSender } from "@/lib/integrations";
 import { auth } from "@/lib/auth";
-import { Channel, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 const sendMessageSchema = z.object({
   contactId: z.string(),

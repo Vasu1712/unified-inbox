@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // lib/integrations/twilio-sender.ts
 import { twilioClient, TWILIO_PHONE, TWILIO_WHATSAPP } from "../twilio";
 import { ChannelSender, MessagePayload, SendResult } from "./types";

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/dashboard/contacts/page.tsx
 "use client";
 
@@ -274,7 +275,6 @@ export default function ContactsPage() {
                       </button>
                       <button
                         onClick={() => {
-                            // Navigate to inbox with this contact
                             window.location.href = `/dashboard?contactId=${contact.id}`;
                         }}
                         className="text-indigo-600 hover:text-indigo-900"

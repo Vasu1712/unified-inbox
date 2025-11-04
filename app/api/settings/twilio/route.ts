@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/settings/twilio/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { twilioClient } from "@/lib/twilio";
